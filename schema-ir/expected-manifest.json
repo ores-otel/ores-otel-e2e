@@ -1,0 +1,40 @@
+{
+  "artifacts": [
+    {
+      "path": "cue/models.cue",
+      "sha256": "eaa130fb2801929d434f10f6ea4efca856272ec7d0e1a8335cefc52fa17794ca"
+    },
+    {
+      "path": "dart/models.dart",
+      "sha256": "aa79d0fd84192555817cac6becbff4bebbe69c9aa06868af4a03f30330398a4f"
+    },
+    {
+      "path": "json-schema/Member.schema.json",
+      "sha256": "fa874b4ab560b5cfbbd01c1d9de5a9067b818ed657dacd878361760215c2fe62"
+    },
+    {
+      "path": "json-schema/Organization.schema.json",
+      "sha256": "3205727994f5ae035e34a1cfc19752422e200311d8e880cd2706c1df527b0bf1"
+    },
+    {
+      "path": "postgres/desired.sql",
+      "sha256": "bb8ea6b157877d33aa74b9c8715c9676df9d19f828ae09f41f7cf2eb2623924c"
+    },
+    {
+      "path": "rust/models.rs",
+      "sha256": "c53e786293521fab89542838e91cf08d57a8ba0a197cc1fb1e4827cbcc5375bd"
+    },
+    {
+      "path": "schema-ir.json",
+      "sha256": "7f14368b9631ba9570a5696801a129929c03af1d3664dd1f6b3dbbe9ce162fc7"
+    },
+    {
+      "path": "typescript/models.ts",
+      "sha256": "ed41cd8a1b0c1cd665e8bc90eba999284074588c64c0c1dd33cf4519e28e50e8"
+    }
+  ],
+  "canonicalization": "sorted-object-keys-and-normalized-ir-v1-not-rfc8785",
+  "generator": "ores.schema-compiler.v1",
+  "irSha256": "7f14368b9631ba9570a5696801a129929c03af1d3664dd1f6b3dbbe9ce162fc7",
+  "schemaVersion": "ores.schema-ir.v1"
+}

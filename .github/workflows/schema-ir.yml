@@ -1,0 +1,55 @@
+name: Schema IR source conformance
+
+on:
+  pull_request:
+    paths: ["schema-ir/**", ".github/workflows/schema-ir.yml"]
+  push:
+    branches: [main]
+    paths: ["schema-ir/**", ".github/workflows/schema-ir.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schema-ir-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-conformance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      ORES_INTERFACES_DIR: ${{ github.workspace }}/.schema-inputs/ores-interfaces
+      ORES_LIB_CORE_DIR: ${{ github.workspace }}/.schema-inputs/ores-lib-core
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ores-otel/ores-interfaces
+          ref: ac9719c8638ecca29434ab34168ab690cec9a874
+          path: .schema-inputs/ores-interfaces
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ores-otel/ores-lib-core
+          ref: 9cde1f343c507ff16e809af32823ece70a158e03
+          path: .schema-inputs/ores-lib-core
+          persist-credentials: false
+      - name: Verify exact source commits and Node runtime
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { execFileSync } from "node:child_process";
+          import { sourceLock, defaultRoots } from "./schema-ir/support.mjs";
+          assert.ok(Number(process.versions.node.split(".")[0]) >= 20, "Node 20+ required");
+          for (const [key, root] of Object.entries(defaultRoots())) {
+            const head = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+            assert.equal(head, sourceLock.packages[key].commit);
+          }
+          NODE
+      - name: Verify source bytes and cross-repository artifact conformance
+        run: node --test schema-ir/conformance.test.mjs
+      - name: Run pinned compiler unit tests
+        run: node --test "$ORES_LIB_CORE_DIR/languages/typescript/test/schema-ir.test.js"
