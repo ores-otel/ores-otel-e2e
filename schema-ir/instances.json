@@ -1,0 +1,235 @@
+[
+  {
+    "name": "valid member",
+    "entity": "Member",
+    "valid": true,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "nullable nickname",
+    "entity": "Member",
+    "valid": true,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "nickname": null
+    }
+  },
+  {
+    "name": "empty optional nickname",
+    "entity": "Member",
+    "valid": true,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "nickname": ""
+    }
+  },
+  {
+    "name": "Unicode code-point boundary",
+    "entity": "Member",
+    "valid": true,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "nickname": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+    }
+  },
+  {
+    "name": "Unicode length exceeded",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "nickname": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+    }
+  },
+  {
+    "name": "bad UUID",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "not-a-uuid",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "UUID newline suffix",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001\n",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "null required UUID",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": null,
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "negative score",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": -1,
+      "enabled": true
+    }
+  },
+  {
+    "name": "score above bound",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 151,
+      "enabled": true
+    }
+  },
+  {
+    "name": "fractional integer",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 1.5,
+      "enabled": true
+    }
+  },
+  {
+    "name": "empty required name",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "name too long",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "unknown property",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "extra": true
+    }
+  },
+  {
+    "name": "null nonnullable name",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": null,
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "NUL not PostgreSQL text",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": true,
+      "nickname": "A\u0000B"
+    }
+  },
+  {
+    "name": "missing required field",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "score": 42,
+      "enabled": true
+    }
+  },
+  {
+    "name": "wrong boolean type",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": 42,
+      "enabled": "true"
+    }
+  },
+  {
+    "name": "boolean not an integer",
+    "entity": "Member",
+    "valid": false,
+    "value": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "organizationId": "00000000-0000-0000-0000-000000000002",
+      "displayName": "Synthetic",
+      "score": true,
+      "enabled": true
+    }
+  }
+]

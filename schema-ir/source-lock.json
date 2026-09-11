@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "kind": "source-conformance-lock",
+  "notice": "Exact source snapshots; NOT proof of a Zed registry release or artifact installation.",
+  "packages": {
+    "interfaces": {
+      "repository": "ores-otel/ores-interfaces",
+      "commit": "ac9719c8638ecca29434ab34168ab690cec9a874",
+      "files": {
+        "contracts/schema-ir/v1/schema.json": "21a78db14e45301f09270205a61be3659a8166dd6aaa0ab8a38b206eb66134ba",
+        "contracts/schema-ir/v1/example.json": "cd59b707c22fc1ac5202df71ea9f43a24fdbfe5e77d18b057efb58867d42768f",
+        "contracts/schema-ir/v1/types.d.ts": "45b06d82b6cdcd2b4f5cb6b0bfcf6c4da1602833145e185b440a49182a1be8d4"
+      }
+    },
+    "core": {
+      "repository": "ores-otel/ores-lib-core",
+      "commit": "9cde1f343c507ff16e809af32823ece70a158e03",
+      "files": {
+        "languages/typescript/package.json": "65cececec21403e5491c1aaf18ed3d024cb5d671ab4ea1af31d310ee9834673f",
+        "languages/typescript/src/schema-ir/index.js": "5de04a405497c80dff623b432bca4c70f9a353549ebad658f738c762c2692b3c",
+        "languages/typescript/src/schema-ir/validate.js": "cceef01a12f0c550dc55e2397ee2a4a8c4bf070d3e1303cbc1fb8ec2035b2b41",
+        "languages/typescript/src/schema-ir/index.d.ts": "c8c00de3a5fa2446ed7ac0b82776e42b30b1460e0308fe49d289352e741c11db",
+        "languages/typescript/test/schema-ir.test.js": "64c3c8ff4e0f007c9fe1ad6fe3757b706cdd72c5bbc013bd3bce29825ed9fcf9"
+      }
+    }
+  }
+}
