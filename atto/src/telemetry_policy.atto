@@ -1,0 +1,22 @@
+// AttoLang source-level policy for bounded telemetry admission.
+// Pure logic only: network I/O, decoding and actor ownership stay with adapters.
+// Conformance is pending actual backend compilation/execution receipts.
+define module telemetry_policy as
+  pub fnc bounded_record(int buffered_bytes, int incoming_bytes, int max_bytes): bool {
+    if buffered_bytes < 0 || incoming_bytes <= 0 || max_bytes <= 0; then
+      return false;
+    fi
+    if incoming_bytes > max_bytes; then return false; fi
+    return buffered_bytes <= max_bytes - incoming_bytes;
+  }
+
+  pub fnc should_export(int queued_records, int batch_limit): bool {
+    if batch_limit <= 0 || queued_records < 0; then return false; fi
+    return queued_records >= batch_limit;
+  }
+
+  pub fnc retryable_status(int status, bool idempotent): bool {
+    if !idempotent; then return false; fi
+    return status == 429 || status == 503;
+  }
+end
