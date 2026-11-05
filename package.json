@@ -2,7 +2,8 @@
   "name": "ores-otel-e2e",
   "private": true,
   "type": "module",
+  "engines": { "node": ">=22" },
   "scripts": {
-    "test": "node tests/contracts.e2e.mjs && node tests/transports.e2e.mjs"
+    "test": "node --test tests/*.test.mjs && node tests/contracts.e2e.mjs && node tests/transports.e2e.mjs"
   }
 }
