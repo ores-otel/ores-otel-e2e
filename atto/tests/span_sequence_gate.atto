@@ -1,0 +1,17 @@
+// Nonzero-exit native guest candidate. Not counted as executed by host checks.
+import class SpanSequenceGate from "../src/span_sequence_gate";
+
+pub routine main() -> int {
+  let mut SpanSequenceGate gate = new SpanSequenceGate(3);
+  if !gate.admit(0); then return 1; fi
+  if gate.admit(0); then return 2; fi
+  if gate.admit(-1); then return 3; fi
+  if !gate.admit(8); then return 4; fi
+  if gate.admit(7); then return 5; fi
+  if !gate.admit(9); then return 6; fi
+  if gate.admit(10); then return 7; fi
+  if gate.count() != 3 || gate.last() != 9; then return 8; fi
+  let mut SpanSequenceGate disabled = new SpanSequenceGate(0);
+  if disabled.admit(1); then return 9; fi
+  return 0;
+}

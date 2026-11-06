@@ -1,0 +1,23 @@
+// Portable AttoLang telemetry admission state.
+// Caller supplies a local sequence; no implicit network/clock, tracing or host ABI.
+define pub class SpanSequenceGate as
+  val int max_events;
+  let int accepted = 0;
+  let int last_sequence = -1;
+
+  pub constructor(int max_events) {
+    self.max_events = max_events;
+  }
+
+  pub fnc admit(mut self)(int sequence) -> bool {
+    if self.max_events < 1 || sequence < 0; then return false; fi
+    if sequence <= self.last_sequence; then return false; fi
+    if self.accepted >= self.max_events; then return false; fi
+    self.last_sequence = sequence;
+    self.accepted = self.accepted + 1;
+    return true;
+  }
+
+  pub count() -> int { return self.accepted; }
+  pub last() -> int { return self.last_sequence; }
+end
