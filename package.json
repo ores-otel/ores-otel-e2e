@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/contracts.e2e.mjs && node tests/transports.e2e.mjs && node --test tests/live-api.e2e.mjs",
-    "test:live": "node tests/require-live.mjs && node --test tests/live-api.e2e.mjs"
+    "test": "node tests/contracts.e2e.mjs && node tests/transports.e2e.mjs && node --test tests/require-live.e2e.mjs tests/live-api.e2e.mjs tests/live-api-hardening.e2e.mjs",
+    "test:live": "node tests/require-live.mjs && node --test tests/live-api.e2e.mjs tests/live-api-hardening.e2e.mjs"
   }
 }
