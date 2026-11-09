@@ -1,0 +1,52 @@
+name: OTLP HTTP admission proof (fixture vs live)
+
+on:
+  pull_request:
+    paths:
+      - 'tests/otlp-live-admission*.mjs'
+      - '.github/workflows/otlp-live-admission.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixture-self-test:
+    name: fixture-checker-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact triggering source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify original PR HEAD, not synthetic merge
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Run no-network synthetic collector fixture tests
+        run: |
+          node --version
+          node --test tests/otlp-live-admission.test.mjs
+
+  live-admission:
+    name: live-otlp-http-admission-only
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact requested SHA
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify workflow source identity
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Probe explicitly configured isolated test collector
+        env:
+          OTLP_BASE_URL: ${{ vars.OTLP_SMOKE_BASE_URL }}
+          OTLP_SMOKE_BEARER: ${{ secrets.OTLP_SMOKE_BEARER }}
+        run: node tests/otlp-live-admission.mjs
