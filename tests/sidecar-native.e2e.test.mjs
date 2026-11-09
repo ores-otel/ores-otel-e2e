@@ -70,13 +70,15 @@ async function awaitReady(port, child) {
 }
 
 async function shutdown(child) {
-  if (child.exitCode !== null) return;
+  const running = () => child.exitCode === null && child.signalCode === null;
+  if (!child.pid || !running()) return;
   const exited = once(child, "exit");
   child.kill("SIGTERM");
   await Promise.race([exited, delay(3_000)]);
-  if (child.exitCode === null) {
+  if (running()) {
+    const killed = once(child, "exit");
     child.kill("SIGKILL");
-    await once(child, "exit");
+    await killed;
   }
 }
 
@@ -95,6 +97,7 @@ test("exact-source Rust sidecar process serves secure HTTP over real TCP", { tim
     },
     stdio: "ignore",
   });
+  child.on("error", () => { /* bounded readiness check reports launch failure */ });
   try {
     await awaitReady(port, child);
 
