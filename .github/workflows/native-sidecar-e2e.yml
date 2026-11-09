@@ -1,0 +1,63 @@
+name: Native production sidecar E2E
+
+on:
+  pull_request:
+    paths:
+      - tests/sidecar-native.e2e.test.mjs
+      - .github/workflows/native-sidecar-e2e.yml
+  push:
+    branches: [main]
+    paths:
+      - tests/sidecar-native.e2e.test.mjs
+      - .github/workflows/native-sidecar-e2e.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-sidecar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      OTEL_SIDECAR_SHA: 17b2aa24ef333d615a020a1a4a7590364ced1d49
+      OTEL_SIDECAR_DIR: ${{ github.workspace }}/.integration/sidecar
+      OTEL_SIDECAR_BIN: ${{ github.workspace }}/.integration/sidecar/target/debug/ores-otel-sidecar
+      EXPECTED_E2E_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact E2E source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Checkout immutable public Rust sidecar source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ores-otel/ores-otel-sidecar.rs
+          ref: 17b2aa24ef333d615a020a1a4a7590364ced1d49
+          path: .integration/sidecar
+          persist-credentials: false
+      - name: Verify exact E2E and sidecar commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_E2E_SHA"
+          test "$(git -C "$OTEL_SIDECAR_DIR" rev-parse HEAD)" = "$OTEL_SIDECAR_SHA"
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87
+        with:
+          toolchain: 1.95.0
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Build production sidecar from locked dependencies
+        run: cargo build --locked --manifest-path "$OTEL_SIDECAR_DIR/Cargo.toml" --bin ores-otel-sidecar
+      - name: Assert native executable, not an optional mocked fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "$OTEL_SIDECAR_BIN"
+          test -f "$OTEL_SIDECAR_DIR/.cli-flags.toml"
+      - name: Execute native process and adversarial TCP requests
+        run: node --test tests/sidecar-native.e2e.test.mjs
