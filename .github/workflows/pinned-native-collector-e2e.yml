@@ -28,11 +28,11 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: ores-otel/ores-otel-monorepo
-          ref: b093674213d156a52d80057abac41b8f5fe19ee0
+          ref: da545e0f826eb424769238ceb0c0f35363ea0c13
           path: collector-source
           persist-credentials: false
       - name: Verify exact collector source commit
-        run: test "$(git -C collector-source rev-parse HEAD)" = "b093674213d156a52d80057abac41b8f5fe19ee0"
+        run: test "$(git -C collector-source rev-parse HEAD)" = "da545e0f826eb424769238ceb0c0f35363ea0c13"
       - name: Use Rust 1.95.0
         run: |
           rustup toolchain install 1.95.0 --profile minimal --component clippy
