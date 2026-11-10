@@ -51,6 +51,7 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
   let exporterFails = false;
   let exporterPartial = false;
   let exporterBogus = false;
+  let exporterEmpty = false;
   const exporter = createServer((req, res) => {
     const chunks = [];
     let total = 0;
@@ -70,8 +71,10 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
       catch { res.writeHead(400); res.end(); return; }
       received.push({ path: req.url, tenant: req.headers['x-ores-tenant-id'], body });
       res.writeHead(exporterFails ? 503 : 200, { 'content-type': 'application/json' });
-      res.end(exporterBogus
-        ? JSON.stringify({ unexpected: 'not-an-OTLP-response' })
+      res.end(exporterEmpty
+        ? ''
+        : exporterBogus
+          ? JSON.stringify({ unexpected: 'not-an-OTLP-response' })
         : exporterPartial
           ? JSON.stringify({ partialSuccess: { rejectedLogRecords: '1', errorMessage: 'sensitive downstream diagnostic' } })
           : '{}');
@@ -116,6 +119,11 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
   const bogus = await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{}] }] }] });
   assert.equal(bogus.status, 502, 'unexpected exporter 200 body is not full acceptance');
   exporterBogus = false;
+
+  exporterEmpty = true;
+  const empty = await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{}] }] }] });
+  assert.equal(empty.status, 502, 'empty exporter HTTP 200 is not an OTLP acceptance receipt');
+  exporterEmpty = false;
 
   const before = received.length;
   assert.equal((await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{}] }] }] },
