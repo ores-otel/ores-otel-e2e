@@ -1,0 +1,49 @@
+name: Pinned native Rust collector wire E2E (staging only)
+
+on:
+  pull_request:
+    paths:
+      - 'tests/native-staging-collector.e2e.test.mjs'
+      - '.github/workflows/pinned-native-collector-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-collector-wire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact E2E head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify original E2E HEAD
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Checkout immutable Rust staging source commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ores-otel/ores-otel-monorepo
+          ref: b405db74af1c561165e146c9e8ba9dada4c91ada
+          path: collector-source
+          persist-credentials: false
+      - name: Verify exact collector source commit
+        run: test "$(git -C collector-source rev-parse HEAD)" = "b405db74af1c561165e146c9e8ba9dada4c91ada"
+      - name: Use Rust 1.95.0
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal --component clippy
+          cargo +1.95.0 --version
+      - name: Compile native Rust collector candidate
+        run: cargo +1.95.0 build --manifest-path collector-source/staging/collector/Cargo.toml
+      - name: Verify real production-shaped test binary exists
+        run: test -x collector-source/staging/collector/target/debug/ores-otel-collector-staging
+      - name: Run real TCP three-signal admission and export path
+        env:
+          COLLECTOR_BIN: collector-source/staging/collector/target/debug/ores-otel-collector-staging
+        run: node --test tests/native-staging-collector.e2e.test.mjs
+      - name: Run native Rust integration and unit tests on identical pinned tree
+        run: cargo +1.95.0 test --manifest-path collector-source/staging/collector/Cargo.toml --all-targets
