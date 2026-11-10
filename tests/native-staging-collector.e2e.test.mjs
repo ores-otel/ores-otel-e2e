@@ -49,6 +49,8 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
   assert.ok(executable, 'COLLECTOR_BIN must be set by exact-SHA Rust build');
   const received = [];
   let exporterFails = false;
+  let exporterPartial = false;
+  let exporterBogus = false;
   const exporter = createServer((req, res) => {
     const chunks = [];
     let total = 0;
@@ -68,7 +70,11 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
       catch { res.writeHead(400); res.end(); return; }
       received.push({ path: req.url, tenant: req.headers['x-ores-tenant-id'], body });
       res.writeHead(exporterFails ? 503 : 200, { 'content-type': 'application/json' });
-      res.end('{}');
+      res.end(exporterBogus
+        ? JSON.stringify({ unexpected: 'not-an-OTLP-response' })
+        : exporterPartial
+          ? JSON.stringify({ partialSuccess: { rejectedLogRecords: '1', errorMessage: 'sensitive downstream diagnostic' } })
+          : '{}');
     });
   });
   const exportPort = await listen(exporter);
@@ -97,6 +103,20 @@ test('immutable staging Rust binary performs real OTLP/HTTP admission and export
   assert.deepEqual(received.map(r => r.path), ['/v1/traces', '/v1/logs', '/v1/metrics']);
   assert.ok(received.every(r => r.tenant === 'synthetic_tenant'));
   assert.equal(received[0].body.resourceSpans[0].scopeSpans[0].spans[0].traceId.length, 32);
+  exporterPartial = true;
+  const partial = await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{ body: { stringValue: 'partial' } }] }] }] });
+  assert.equal(partial.status, 200, 'OTLP partial success must not become retryable 503');
+  const partialBody = await partial.json();
+  assert.equal(partialBody.partialSuccess.rejectedLogRecords, '1');
+  assert.equal(partialBody.partialSuccess.errorMessage, 'upstream exporter warning or partial rejection');
+  assert.ok(!JSON.stringify(partialBody).includes('sensitive downstream diagnostic'));
+  exporterPartial = false;
+
+  exporterBogus = true;
+  const bogus = await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{}] }] }] });
+  assert.equal(bogus.status, 502, 'unexpected exporter 200 body is not full acceptance');
+  exporterBogus = false;
+
   const before = received.length;
   assert.equal((await request(base, 'logs', { resourceLogs: [{ scopeLogs: [{ logRecords: [{}] }] }] },
     { 'x-ores-tenant-id': 'forged_other_tenant' })).status, 403);
